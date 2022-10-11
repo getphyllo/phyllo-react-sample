@@ -1,121 +1,77 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import openPhylloSDK from "../service/phyllosdk";
-import { getAccounts, createUserToken } from "../service/phylloservice";
+import PhylloSDK from "../service/phyllosdk";
+import { getAccounts } from "../service/phylloservice";
 
 const Users = () => {
   let [accounts, setAccounts] = useState([]);
-  var heading = [
-    "Account ID",
-    "Platform Profile Name",
-    "Work Platform",
-    "Status",
-    "Platform Username",
-    "Created At",
-    "Updated At",
-    "UserId",
-    "Work-PlatformId",
-    "Engagement Status",
-    "Enagagement Last Sync",
-  ];
-  let navigate = useNavigate();
+  let [attributes, setAttributes] = useState({});
+  let phylloSDK = new PhylloSDK();
+  
+  const handleAddAccount = async () => {
+    await phylloSDK.openPhylloSDK();
+  };
+
+  const flattenObj = (ob) => {
+    let result = {};
+    for (const i in ob) {
+      if (typeof ob[i] === "object" && !Array.isArray(ob[i])) {
+        const temp = flattenObj(ob[i]);
+        for (const j in temp) {
+          result[i + "." + j] = temp[j];
+        }
+      } else {
+        result[i] = ob[i];
+      }
+    }
+    return result;
+  };
 
   useEffect(() => {
     (async () => {
       let response = await getAccounts(localStorage.getItem("USER_ID"));
-      console.log(response.data.data);
-      setAccounts(response.data.data);
+      let arr = response.data.data;
+      let updatedArray = arr.map((obj) => {
+        let flattenedObj = flattenObj(obj);
+        return flattenedObj;
+      });
+      console.log(updatedArray);
+      setAccounts(updatedArray);
+      setAttributes(updatedArray[0]);
     })();
   }, []);
-
-  const handleRetryAccountConnection = async () => {
-    let userId = localStorage.getItem("USER_ID");
-    let token = await createUserToken(userId);
-    let phylloConnect = openPhylloSDK(userId, token);
-    phylloConnect.open();
-  };
-
-  const handleAddAccount = () => {
-    let userId = localStorage.getItem("USER_ID");
-    let token = localStorage.getItem("USER_TOKEN");
-    let phylloConnect = openPhylloSDK(userId, token);
-
-    phylloConnect.on(
-      "accountConnected",
-      (accountId, workplatformId, userId) => {
-        console.log(
-          `onAccountConnected: ${accountId}, ${workplatformId}, ${userId}`
-        );
-      }
-    );
-
-    phylloConnect.on(
-      "accountDisconnected",
-      (accountId, workplatformId, userId) => {
-        console.log(
-          `onAccountDisconnected: ${accountId}, ${workplatformId}, ${userId}`
-        );
-      }
-    );
-
-    phylloConnect.on("tokenExpired", (userId) => {
-      console.log(`onTokenExpired: ${userId}`);
-      if (
-        window.confirm("Your session has expired, but we can help you fix it")
-      ) {
-        localStorage.removeItem("USER_TOKEN");
-        handleRetryAccountConnection();
-      } else {
-        navigate("/");
-      }
-    });
-
-    phylloConnect.on("exit", (reason, userId) => {
-      console.log(`onExit: ${reason}, ${userId}`);
-      window.location.reload();
-      alert(reason);
-    });
-
-    phylloConnect.on("connectionFailure", (reason, workplatformId, userId) => {
-      console.log(
-        `onConnectionFailure: ${reason}, ${workplatformId}, ${userId}`
-      );
-      alert("reason");
-    });
-
-    phylloConnect.open();
-  };
 
   return (
     <div>
       <h1 style={{ margin: "20px" }}>Accounts</h1>
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        class="table-responsive"
+        style={{ display: "block", margin: "auto", width: "80%" }}
       >
-        <table
-          className="table table-bordered table-striped"
-          style={{ width: "95%" }}
-        >
+        <table className="table table-striped table-bordered">
           <thead>
             <tr>
-              {heading.map((head, idx) => {
+              <th>Attribute</th>
+              {accounts.map((obj, idx) => {
                 return (
                   <th scope="col" key={idx}>
-                    {head}
+                    Account-{idx + 1}
                   </th>
                 );
               })}
             </tr>
           </thead>
           <tbody>
-            {accounts.map((obj, idx) => {
-              return <User user={obj} key={idx} />;
-            })}
+            <tr>
+              <td>
+                {Object.entries(attributes).map((val, idx) => {
+                  return <tr key={idx}>{val[0]}</tr>;
+                })}
+              </td>
+              {accounts.map((obj, idx) => {
+                return <User user={obj} key={idx} />;
+              })}
+            </tr>
           </tbody>
         </table>
       </div>
@@ -139,67 +95,49 @@ const Users = () => {
 };
 
 function User(props) {
-  const {
-    id,
-    platform_profile_name,
-    username,
-    work_platform,
-    status,
-    created_at,
-    updated_at,
-    user,
-    data,
-  } = props.user;
-
-  const getDate = (created_at) => {
-    var date = new Date(created_at);
-    var dateWithoutTime =
-      date.getFullYear().toString() +
-      "-" +
-      date.getMonth().toString() +
-      "-" +
-      date.getDate().toString();
-    return dateWithoutTime;
-  };
-
   return (
-    <tr>
-      <td>{id}</td>
-      <td>{platform_profile_name}</td>
-      <td>{work_platform.name}</td>
-      <td>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {status}
-          <div
-            style={{
-              width: "10px",
-              height: "10px",
-              background:
-                status === "CONNECTED"
-                  ? "green"
-                  : status === "NOT_CONNECTED"
-                  ? "red"
-                  : "yellow",
-              borderRadius: "50%",
-              marginLeft: "10px",
-            }}
-          ></div>
-        </div>
-      </td>
-      <td>{username}</td>
-      <td>{getDate(created_at)}</td>
-      <td>{getDate(updated_at)}</td>
-      <td>{user.id}</td>
-      <td>{work_platform.id}</td>
-      <td>{data.engagement.status}</td>
-      <td>{getDate(data.engagement.last_sync_at)}</td>
-    </tr>
+    <td className="data">
+      {Object.entries(props.user).map((val, idx) => {
+        if (
+          val[0] === "profile_pic_url" ||
+          val[0] === "work_platform.logo_url"
+        ) {
+          return (
+            <tr key={idx}>
+              <img src={val[1]} alt="" />
+            </tr>
+          );
+        } else if (val[0] === "status") {
+          return (
+            <tr key={idx}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {val[1]}
+                <div
+                  style={{
+                    width: "10px",
+                    height: "10px",
+                    background:
+                      val[1] === "CONNECTED"
+                        ? "green"
+                        : val[1] === "NOT_CONNECTED"
+                        ? "red"
+                        : "yellow",
+                    borderRadius: "50%",
+                    marginLeft: "10px",
+                  }}
+                ></div>
+              </div>
+            </tr>
+          );
+        }
+        return <tr key={idx}>{val[1]}</tr>;
+      })}
+    </td>
   );
 }
 
