@@ -1,5 +1,5 @@
 * {
-  margin: 0;
+  margin: 2px;
   padding: 0;
   box-sizing: border-box;
 }
@@ -16,8 +16,12 @@ td{
   min-width: 200px; */
 }
 
+tr{
+  height: 30px;
+}
+
 img{
-  height:9%;
-  width:9%;
+  height:8%;
+  width:8%;
   border-radius: 20px;
 }

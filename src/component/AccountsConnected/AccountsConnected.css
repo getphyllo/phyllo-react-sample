@@ -1,0 +1,15 @@
+.account-connect-button{
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    height: 50px;
+    width: 20%;
+    display: block;
+    margin: auto;
+    background: aquamarine;
+    cursor: "pointer",
+}
+
+.status{
+    display: flex;
+    align-items: center
+}

@@ -1,13 +1,15 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import PhylloSDK from "../service/phyllosdk";
-import { getAccounts } from "../service/phylloservice";
+import PhylloSDK from "../../service/phyllosdk";
+import { getAccounts } from "../../service/phylloservice";
+import Navbar from "../Navbar/Navbar";
+import "./AccountsConnected.css";
 
 const Users = () => {
   let [accounts, setAccounts] = useState([]);
   let [attributes, setAttributes] = useState({});
   let phylloSDK = new PhylloSDK();
-  
+
   const handleAddAccount = async () => {
     await phylloSDK.openPhylloSDK();
   };
@@ -43,12 +45,15 @@ const Users = () => {
 
   return (
     <div>
-      <h1 style={{ margin: "20px" }}>Accounts</h1>
+      <Navbar />
       <div
         class="table-responsive"
         style={{ display: "block", margin: "auto", width: "80%" }}
       >
-        <table className="table table-striped table-bordered">
+        <table
+          className="table table-striped table-bordered"
+          style={{ margin: "20px" }}
+        >
           <thead>
             <tr>
               <th>Attribute</th>
@@ -64,69 +69,55 @@ const Users = () => {
           <tbody>
             <tr>
               <td>
-                {Object.entries(attributes).map((val, idx) => {
-                  return <tr key={idx}>{val[0]}</tr>;
+                {Object.entries(attributes).map((obj, idx) => {
+                  let property = obj[0];
+                  return <tr key={idx}>{property}</tr>;
                 })}
               </td>
               {accounts.map((obj, idx) => {
-                return <User user={obj} key={idx} />;
+                return (
+                  <Account accountObj={obj} key={idx} attributes={attributes} />
+                );
               })}
             </tr>
           </tbody>
         </table>
       </div>
-      <button
-        style={{
-          border: "1px solid lightgray",
-          borderRadius: "8px",
-          height: "50px",
-          width: "20%",
-          display: "block",
-          margin: "auto",
-          background: "aquamarine",
-          cursor: "pointer",
-        }}
-        onClick={handleAddAccount}
-      >
+      <button className="account-connect-button" onClick={handleAddAccount}>
         Add Another Account
       </button>
     </div>
   );
 };
 
-function User(props) {
+function Account(props) {
+  let account = props.accountObj;
+
   return (
-    <td className="data">
-      {Object.entries(props.user).map((val, idx) => {
-        if (
-          val[0] === "profile_pic_url" ||
-          val[0] === "work_platform.logo_url"
-        ) {
+    <td>
+      {Object.entries(props.attributes).map((obj, idx) => {
+        let key = obj[0];
+        if (key === "profile_pic_url" || key === "work_platform.logo_url") {
           return (
             <tr key={idx}>
-              <img src={val[1]} alt="" />
+              <img src={account[key]} alt="" />
             </tr>
           );
-        } else if (val[0] === "status") {
+        } else if (key === "status") {
           return (
             <tr key={idx}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                {val[1]}
+              <div className="status">
+                {account[key]}
                 <div
                   style={{
                     width: "10px",
                     height: "10px",
                     background:
-                      val[1] === "CONNECTED"
+                      account[key] === "CONNECTED"
                         ? "green"
-                        : val[1] === "NOT_CONNECTED"
+                        : account[key] === "NOT_CONNECTED"
                         ? "red"
-                        : "yellow",
+                        : "orange",
                     borderRadius: "50%",
                     marginLeft: "10px",
                   }}
@@ -134,8 +125,10 @@ function User(props) {
               </div>
             </tr>
           );
+        } else if (account[key] === undefined) {
+          return <tr>-</tr>;
         }
-        return <tr key={idx}>{val[1]}</tr>;
+        return <tr key={idx}>{account[key]}</tr>;
       })}
     </td>
   );
