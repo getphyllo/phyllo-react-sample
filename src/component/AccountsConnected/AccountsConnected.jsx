@@ -48,7 +48,7 @@ const Users = () => {
       <Navbar />
       <div
         class="table-responsive"
-        style={{ display: "block", margin: "auto", width: "80%" }}
+        style={{ display: "block", margin: "auto", width: "95%" }}
       >
         <table
           className="table table-striped table-bordered"

@@ -10,14 +10,17 @@ code {
 }
 
 td{
-  overflow: auto;
+  overflow: hidden;
   text-overflow: ellipsis;
-  /* max-width: 320px;
-  min-width: 200px; */
+  white-space: nowrap;
 }
 
 tr{
   height: 30px;
+}
+
+th{
+  text-align: center;
 }
 
 img{
