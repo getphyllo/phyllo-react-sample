@@ -75,14 +75,4 @@ const getAccounts = async(userId)=>{
     }
 }
 
-const getProfile = async(accountId)=>{
-    try{
-        const api = getAxiosInstance();
-        let response = await api.get(`${URL_GET_PROFILE}?account_id=${accountId}`);
-        return response;
-    }catch(err){
-        return err.body;
-    }
-}
-
-export {createUser,createUserToken,getAccounts,getProfile}
+export {createUser,createUserToken,getAccounts}
