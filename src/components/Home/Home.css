@@ -1,0 +1,17 @@
+.home-container{
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex: wrap;
+    flex-direction: column;
+}
+
+.home-button{
+    height: 6%;
+    width: 20%;
+    border-radius: 10px;
+    border: 1px solid lightblue;
+    background: aqua;
+    cursor: pointer;
+}
