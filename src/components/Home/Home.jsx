@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "../Navbar/Navbar";
-import PhylloSDK from "../../service/phyllosdk";
+import PhylloSDK from "../../phylloSDKService/phylloSDKInit";
 import "./Home.css";
 
 const Home = () => {

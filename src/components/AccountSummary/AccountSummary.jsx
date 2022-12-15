@@ -1,9 +1,9 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import PhylloSDK from "../../service/phyllosdk";
-import { getAccounts } from "../../service/phylloservice";
+import PhylloSDK from "../../phylloSDKService/phylloSDKInit";
+import { getAccounts } from "../../phylloSDKService/phylloServiceAPIs";
 import Navbar from "../Navbar/Navbar";
-import "./AccountsConnected.css";
+import "./AccountSummary.css";
 
 const Users = () => {
   let [accounts, setAccounts] = useState([]);
@@ -31,7 +31,7 @@ const Users = () => {
 
   useEffect(() => {
     (async () => {
-      let response = await getAccounts(localStorage.getItem("USER_ID"));
+      let response = await getAccounts(localStorage.getItem("PHYLLO_USER_ID"));
       let arr = response.data.data;
       if (arr.length > 0) {
         let updatedArray = arr.map((obj) => {

@@ -21,7 +21,7 @@ const getAxiosInstance = () => {
 
 const createUser = async (username, externalId) => {
   try {
-    const userId = localStorage.getItem("USER_ID");
+    const userId = localStorage.getItem("PHYLLO_USER_ID");
     if (Boolean(userId)) {
       return userId;
     }
@@ -30,7 +30,7 @@ const createUser = async (username, externalId) => {
       name: username,
       external_id: externalId,
     });
-    localStorage.setItem("USER_ID", response.data.id);
+    localStorage.setItem("PHYLLO_USER_ID", response.data.id);
     return response.data.id;
   } catch (err) {
     return err.body;
@@ -39,7 +39,7 @@ const createUser = async (username, externalId) => {
 
 const createUserToken = async (userId) => {
   try {
-    const token = localStorage.getItem("USER_TOKEN");
+    const token = localStorage.getItem("PHYLLO_SDK_TOKEN");
     if (Boolean(token)) {
       return token;
     }
@@ -48,7 +48,7 @@ const createUserToken = async (userId) => {
       user_id: userId,
       products: ["IDENTITY", "ENGAGEMENT"],
     });
-    localStorage.setItem("USER_TOKEN", response.data.sdk_token);
+    localStorage.setItem("PHYLLO_SDK_TOKEN", response.data.sdk_token);
     return response.data.sdk_token;
   } catch (err) {
     return err.body;

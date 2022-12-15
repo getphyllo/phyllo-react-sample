@@ -1,4 +1,4 @@
-import { createUser, createUserToken } from "./phylloservice";
+import { createUser, createUserToken } from "./phylloServiceAPIs";
 
 class PhylloSDK {
   async openPhylloSDK() {
@@ -27,7 +27,8 @@ class PhylloSDK {
     phylloConnect.on("tokenExpired", (userId) => {
       console.log(`onTokenExpired: ${userId}`);
       if (window.confirm("Your session has expired, but we can help you fix it")) {
-        localStorage.removeItem("USER_TOKEN");
+        // Reinitiating Phyllo SDK
+        localStorage.removeItem("PHYLLO_SDK_TOKEN");
         this.openPhylloSDK();
       } else {
         window.location.href = "/";
@@ -36,51 +37,17 @@ class PhylloSDK {
 
     phylloConnect.on("exit", (reason, userId) => {
       console.log(`onExit: ${reason}, ${userId}`);
-      alert("Phyllo-SDK Exit Reason: " + reason);
+      alert("Phyllo SDK exit reason: " + reason);
       window.location.href = "/accounts";
     });
 
     phylloConnect.on("connectionFailure", (reason, workplatformId, userId) => {
       console.log(`onConnectionFailure: ${reason}, ${workplatformId}, ${userId}`);
-      alert("WorkPlatform Connection Failure Reason: " + reason);
+      alert("WorkPlatform connection failure reason: " + reason);
     });
 
     phylloConnect.open();
   }
 }
-
-const handleRetryAccountConnection = async (config) => {
-  let userId = localStorage.getItem("USER_ID");
-  let token = await createUserToken(userId);
-
-  const newConfig = { ...config, token };
-
-  const phylloConnect = window.PhylloConnect.initialize(newConfig);
-
-  phylloConnect.on("accountConnected", (accountId, workplatformId, userId) => {
-    console.log(`onAccountConnected: ${accountId}, ${workplatformId}, ${userId}`);
-  });
-
-  phylloConnect.on("accountDisconnected", (accountId, workplatformId, userId) => {
-    console.log(`onAccountDisconnected: ${accountId}, ${workplatformId}, ${userId}`);
-  });
-
-  phylloConnect.on("tokenExpired", (userId) => {
-    console.log(`onTokenExpired: ${userId}`);
-  });
-
-  phylloConnect.on("exit", (reason, userId) => {
-    console.log(`onExit: ${reason}, ${userId}`);
-    alert("Phyllo-SDK Exit Reason: " + reason);
-    window.location.href = "/accounts";
-  });
-
-  phylloConnect.on("connectionFailure", (reason, workplatformId, userId) => {
-    console.log(`onConnectionFailure: ${reason}, ${workplatformId}, ${userId}`);
-    alert("WorkPlatform Connection Failure Reason: " + reason);
-  });
-
-  phylloConnect.open();
-};
 
 export default PhylloSDK;
