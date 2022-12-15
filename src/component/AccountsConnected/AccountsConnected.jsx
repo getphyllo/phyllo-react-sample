@@ -33,27 +33,22 @@ const Users = () => {
     (async () => {
       let response = await getAccounts(localStorage.getItem("USER_ID"));
       let arr = response.data.data;
-      let updatedArray = arr.map((obj) => {
-        let flattenedObj = flattenObj(obj);
-        return flattenedObj;
-      });
-      console.log(updatedArray);
-      setAccounts(updatedArray);
-      setAttributes(updatedArray[0]);
+      if (arr.length > 0) {
+        let updatedArray = arr.map((obj) => {
+          let flattenedObj = flattenObj(obj);
+          return flattenedObj;
+        });
+        setAccounts(updatedArray);
+        setAttributes(updatedArray[0]);
+      }
     })();
   }, []);
 
   return (
     <div>
       <Navbar />
-      <div
-        class="table-responsive"
-        style={{ display: "block", margin: "auto", width: "95%" }}
-      >
-        <table
-          className="table table-striped table-bordered"
-          style={{ margin: "20px" }}
-        >
+      <div className="table-responsive" style={{ display: "block", margin: "auto", width: "95%" }}>
+        <table className="table table-striped table-bordered" style={{ margin: "20px" }}>
           <thead>
             <tr>
               <th>Attribute</th>
@@ -75,9 +70,7 @@ const Users = () => {
                 })}
               </td>
               {accounts.map((obj, idx) => {
-                return (
-                  <Account accountObj={obj} key={idx} attributes={attributes} />
-                );
+                return <Account accountObj={obj} key={idx} attributes={attributes} />;
               })}
             </tr>
           </tbody>
@@ -112,12 +105,7 @@ function Account(props) {
                   style={{
                     width: "10px",
                     height: "10px",
-                    background:
-                      account[key] === "CONNECTED"
-                        ? "green"
-                        : account[key] === "NOT_CONNECTED"
-                        ? "red"
-                        : "orange",
+                    background: account[key] === "CONNECTED" ? "green" : account[key] === "NOT_CONNECTED" ? "red" : "orange",
                     borderRadius: "50%",
                     marginLeft: "10px",
                   }}
